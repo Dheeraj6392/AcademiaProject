@@ -1,0 +1,108 @@
+<div class="top-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-md col-xl-5 d-flex align-items-center">
+                <a class="navbar-brand align-items-center">
+                    Academia
+                    <span>Online Education &amp; Learning</span>
+                </a>
+            </div>
+            <div class="col-md d-flex align-items-center">
+                <div class="con d-flex">
+                    <div class="icon"><span class="flaticon-clock"></span></div>
+                    <div class="text">
+                        <span>Monday - Friday</span>
+                        <div class="timer" style="color: #fff;">{{ currentTime }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md d-flex align-items-center">
+                <div class="con d-flex">
+                    <div class="icon"><span class="flaticon-telephone"></span></div>
+                    <div class="text">
+                        <span>Call Us</span>
+                        <strong>+91 6392879668</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md d-flex justify-content-end align-items-center">
+                <div class="social-media">
+                    <p class="mb-0 d-flex">
+                        <a href="#" class="d-flex align-items-center justify-content-center"><span
+                                class="fa fa-facebook"><i class="sr-only">Facebook</i></span></a>
+                        <a href="#" class="d-flex align-items-center justify-content-center"><span
+                                class="fa fa-twitter"><i class="sr-only">Twitter</i></span></a>
+                        <a href="#" class="d-flex align-items-center justify-content-center"><span
+                                class="fa fa-instagram"><i class="sr-only">Instagram</i></span></a>
+                        <a href="#" class="d-flex align-items-center justify-content-center"><span
+                                class="fa fa-dribbble"><i class="sr-only">Dribbble</i></span></a>
+                    </p>
+                </div>
+                <!-- Moved auth controls to top bar -->
+                <div class="auth-controls d-flex align-items-center gap-2 ms-3">
+                    <a class="btn btn-outline-light btn-sm" *ngIf="!auth.isLoggedIn()" [routerLink]="['/login']">Login</a>
+                    <a class="btn btn-success btn-sm" *ngIf="!auth.isLoggedIn()" [routerLink]="['/register']">Register</a>
+                    <div *ngIf="auth.isLoggedIn()" class="position-relative">
+                        <button type="button" (click)="$event.stopPropagation(); toggleProfileMenu()" class="profile-avatar btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center" aria-label="Profile" [title]="username" style="width:32px;height:32px;">
+                            <span class="fw-bold">{{ initials }}</span>
+                        </button>
+                        <div class="profile-menu dropdown-menu dropdown-menu-end show" *ngIf="showProfileMenu" style="position: absolute; right: 0; top: 38px;">
+                            <div class="px-3 py-2 small text-muted">Signed in as</div>
+                            <div class="px-3 pb-2"><strong>{{ username }}</strong><div class="text-muted">Role: {{ auth.role }}</div></div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" [routerLink]="['/cards']">My Dashboard</a>
+                            <a *ngIf="auth.isAdmin()" class="dropdown-item" [routerLink]="['/admin/papers']">Moderate Papers</a>
+                            <a *ngIf="auth.isAdmin()" class="dropdown-item" [routerLink]="['/upload_papers']">Upload Papers</a>
+                            <a class="dropdown-item" [routerLink]="['/courses']">View Courses</a>
+                            <a class="dropdown-item" [routerLink]="['/my-courses']">My Courses</a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item text-danger" (click)="logout()">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ?*******************  hero section-->
+
+
+<section class="hero-wrap"
+    style="background-image: url('https://preview.colorlib.com/theme/academia/images/bg_1.jpg.webp');">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center">
+            <div class="col-lg-5">
+                <div class="text mt-5 pt-5 aos-init aos-animate" data-aos="fade-up" data-aos-delay="300"
+                    data-aos-duration="1000">
+                    <span class="subheading">Welcome to Academia</span>
+                    <h1 class="mb-4">BEST ONLINE EDUCATION <br>AND PRACTICE PLATFORM </h1>
+                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and
+                        Consonantia, there live the blind texts.</p>
+                    <p>
+                        <button class="btn btn-primary p-4 py-3" routerLink="/cards">get started now</button>
+                        <button class="btn btn-white p-4 py-3" routerLink="courses">View Courses</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Academia</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- existing nav items -->
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <!-- Auth controls moved to top bar -->
+      </div>
+    </div>
+  </div>
+</nav>

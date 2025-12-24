@@ -1,0 +1,35 @@
+/* Section layout */
+#course {
+  background: #f9fbff;
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Headings */
+.fw-semibold {
+  font-weight: 600 !important;
+  text-align: center;
+}
+
+/* My Courses - refreshed UI */
+.course-card {
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.course-card:hover {
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.badge { font-size: 0.85rem; }
+.card-title { font-weight: 600; }

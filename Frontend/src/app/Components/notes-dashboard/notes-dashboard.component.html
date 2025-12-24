@@ -1,0 +1,128 @@
+<div class="notes-container">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <h3>Electronics Topics</h3>
+    <a [routerLink]="[]" fragment="basics">Basics of Electronics</a>
+    <a [routerLink]="[]" fragment="resistors">Resistors & Ohm’s Law</a>
+    <a [routerLink]="[]" fragment="capacitors">Capacitors</a>
+    <a [routerLink]="[]" fragment="inductors">Inductors</a>
+    <a [routerLink]="[]" fragment="diodes">Diodes</a>
+    <a [routerLink]="[]" fragment="transistors">Transistors</a>
+    <a [routerLink]="[]" fragment="opamps">Operational Amplifiers</a>
+  </nav>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Search bar -->
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search topics..."
+        (input)="onSearch()"
+      />
+      <button (click)="onSearch()">Search</button>
+    </div>
+
+    <!-- Sections -->
+
+    <section id="basics">
+      <h2 [innerHTML]="highlight('Basics of Electronics')"></h2>
+      <p [innerHTML]="highlight('Electronics is the study of electrical circuits that involve active components such as diodes, transistors, and integrated circuits. It is the foundation of modern devices like computers, smartphones, and communication systems.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Electric Charge, Current, Voltage, Power')"></li>
+        <li [innerHTML]="highlight('Direct Current (DC) vs Alternating Current (AC)')"></li>
+        <li [innerHTML]="highlight('Passive Components: Resistors, Capacitors, Inductors')"></li>
+        <li [innerHTML]="highlight('Active Components: Diodes, Transistors, ICs')"></li>
+        <li [innerHTML]="highlight('Analog vs Digital Electronics')"></li>
+      </ul>
+    </section>
+
+    <section id="resistors">
+      <h2 [innerHTML]="highlight('Resistors & Ohm’s Law')"></h2>
+      <p [innerHTML]="highlight('Resistors oppose the flow of electric current. Ohm’s Law defines the relationship between voltage (V), current (I), and resistance (R). It is fundamental to circuit analysis.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Ohm’s Law: V = I × R')"></li>
+        <li [innerHTML]="highlight('Series and Parallel Resistor Combinations')"></li>
+        <li [innerHTML]="highlight('Power Dissipation: P = V × I = I²R = V²/R')"></li>
+        <li [innerHTML]="highlight('Color Coding for Resistor Values')"></li>
+        <li [innerHTML]="highlight('Applications: Voltage Division, Current Limiting')"></li>
+      </ul>
+      <pre><code>Example:  
+If V = 12V and R = 6Ω, then I = V/R = 2A</code></pre>
+    </section>
+
+    <section id="capacitors">
+      <h2 [innerHTML]="highlight('Capacitors')"></h2>
+      <p [innerHTML]="highlight('Capacitors store energy in the form of an electric field. They are widely used in filtering, timing circuits, and energy storage.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Capacitance: C = Q/V (Farads)')"></li>
+        <li [innerHTML]="highlight('Energy Stored: E = ½CV²')"></li>
+        <li [innerHTML]="highlight('Series and Parallel Capacitor Combinations')"></li>
+        <li [innerHTML]="highlight('Applications: Smoothing in Power Supplies, Coupling/Decoupling')"></li>
+      </ul>
+      <pre><code>Example:  
+A 100µF capacitor charged to 10V stores  
+E = ½ × 100e-6 × (10²) = 0.005 Joules</code></pre>
+    </section>
+
+    <section id="inductors">
+      <h2 [innerHTML]="highlight('Inductors')"></h2>
+      <p [innerHTML]="highlight('Inductors store energy in a magnetic field when current flows through them. They are used in filters, transformers, and power supplies.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Inductance (L) measured in Henry (H)')"></li>
+        <li [innerHTML]="highlight('Voltage across Inductor: V = L (di/dt)')"></li>
+        <li [innerHTML]="highlight('Energy Stored: E = ½LI²')"></li>
+        <li [innerHTML]="highlight('Applications: Chokes, Transformers, RF Circuits')"></li>
+      </ul>
+      <pre><code>Example:  
+If L = 2H and current rises at 3A/s,  
+V = L (di/dt) = 2 × 3 = 6V</code></pre>
+    </section>
+
+    <section id="diodes">
+      <h2 [innerHTML]="highlight('Diodes')"></h2>
+      <p [innerHTML]="highlight('A diode allows current to flow in one direction only. It is a key component in rectifiers, clippers, clampers, and voltage regulators.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Forward Bias vs Reverse Bias')"></li>
+        <li [innerHTML]="highlight('PN Junction Characteristics')"></li>
+        <li [innerHTML]="highlight('Rectification: Half-wave and Full-wave')"></li>
+        <li [innerHTML]="highlight('Special Diodes: Zener, LED, Schottky')"></li>
+      </ul>
+      <pre><code>Example:  
+A 10V AC applied to a diode rectifier produces  
+a pulsating DC output waveform.</code></pre>
+    </section>
+
+    <section id="transistors">
+      <h2 [innerHTML]="highlight('Transistors')"></h2>
+      <p [innerHTML]="highlight('A transistor is a semiconductor device used for amplification and switching. It is the backbone of modern electronics.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Types: BJT (NPN/PNP) and FET (MOSFET, JFET)')"></li>
+        <li [innerHTML]="highlight('BJT Current Relations: Ic = βIb')"></li>
+        <li [innerHTML]="highlight('Modes: Cutoff, Active, Saturation')"></li>
+        <li [innerHTML]="highlight('Applications: Amplifiers, Switches, Oscillators')"></li>
+      </ul>
+      <pre><code>Example:  
+If β = 100 and Ib = 20µA,  
+Ic = β × Ib = 2mA</code></pre>
+    </section>
+
+    <section id="opamps">
+      <h2 [innerHTML]="highlight('Operational Amplifiers (Op-Amps)')"></h2>
+      <p [innerHTML]="highlight('An operational amplifier is a high-gain voltage amplifier with differential inputs and usually a single output. It is used in analog signal processing.')"></p>
+      <ul>
+        <li [innerHTML]="highlight('Ideal Properties: Infinite Gain, Infinite Input Resistance, Zero Output Resistance')"></li>
+        <li [innerHTML]="highlight('Inverting and Non-Inverting Amplifiers')"></li>
+        <li [innerHTML]="highlight('Integrator and Differentiator Circuits')"></li>
+        <li [innerHTML]="highlight('Applications: Filters, Oscillators, Signal Conditioning')"></li>
+      </ul>
+      <pre><code>Example:  
+For an inverting amplifier,  
+Gain = -Rf/Rin</code></pre>
+    </section>
+
+  </div>
+</div>

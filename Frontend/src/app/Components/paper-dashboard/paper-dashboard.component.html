@@ -1,0 +1,45 @@
+<div class="search-container">
+  <input
+    type="text"
+    [(ngModel)]="searchTerm"
+    placeholder="Enter year (e.g., 2023)"
+  />
+  <button (click)="onSearch()">Search</button>
+</div>
+
+<div class="qpaper-container">
+  <div class="card" *ngFor="let paper of filteredQpapers">
+
+    <!-- Static PDF icon -->
+    <img [src]= paper.fileUrl alt="PDF" class="pdf-icon" />
+
+    <div class="info">
+      <p>Semester: {{ paper.semester }}</p>
+      <p>Year: {{ paper.year }}</p>
+
+      <button class="view-btn" (click)="openModal(paper.fileUrl)">
+        View
+      </button>
+
+      <a class="download-btn" [href]="paper.fileUrl" target="_blank">
+        Download
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- PDF MODAL -->
+<div class="modal-overlay" *ngIf="selectedPdfUrl" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <iframe
+      [src]="selectedPdfUrl"
+      width="100%"
+      height="500px"
+      frameborder="0">
+    </iframe>
+
+    <button class="close-btn" (click)="closeModal()">Close</button>
+  </div>
+</div>

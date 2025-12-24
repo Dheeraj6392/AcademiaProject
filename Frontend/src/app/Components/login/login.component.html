@@ -1,0 +1,29 @@
+<div class="container py-5" style="max-width: 500px;">
+  <h2 class="mb-4 text-center">Sign In</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input id="username" class="form-control" formControlName="username" placeholder="Enter your username" />
+      <div class="text-danger" *ngIf="form.controls['username'].touched && form.controls['username'].invalid">
+        Username is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control" formControlName="password" placeholder="Enter your password" />
+      <div class="text-danger" *ngIf="form.controls['password'].touched && form.controls['password'].invalid">
+        Password is required (min 4 characters).
+      </div>
+    </div>
+
+    <div class="text-center mt-3">
+      Don't have an account? <a [routerLink]="['/register']">Register</a>
+    </div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <button class="btn btn-primary w-100" [disabled]="loading">
+      {{ loading ? 'Signing in...' : 'Sign In' }}
+    </button>
+  </form>
+</div>

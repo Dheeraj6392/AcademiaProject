@@ -1,0 +1,37 @@
+<h2 class="display-4 fw-semibold mb-2">Courses</h2>
+<p class="text-muted text-center mb-4">Discover courses and start learning today.</p>
+
+<section id="course" class="padding-medium">
+  <div class="container">
+    <!-- Empty state -->
+    <div *ngIf="courses.length === 0" class="text-center py-5">
+      <img src="/images/empty-state.svg" alt="No courses" class="mb-4" style="max-width: 180px;" />
+      <h5 class="fw-semibold">No courses available right now.</h5>
+      <p class="text-muted">Please check back later.</p>
+    </div>
+
+    <!-- Courses grid -->
+    <div class="text-center mb-3" *ngIf="courses.length > 0">
+      <p class="m-0 text-muted">Showing {{ courses.length }} courses</p>
+    </div>
+
+    <div class="row" *ngIf="courses.length > 0">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let c of courses">
+        <div class="course-card card h-100 position-relative">
+          <div class="z-1 position-absolute m-3">
+            <span class="badge bg-primary">{{ c.weeks }} Weeks</span>
+          </div>
+          <img [src]="c.imageUrl" class="card-img-top object-fit-cover rounded-top" [alt]="c.title" style="height: 160px;" />
+          <div class="card-body">
+            <h5 class="card-title text-capitalize">{{ c.title }}</h5>
+            <p class="card-text text-muted line-clamp-2">{{ c.description }}</p>
+            <div class="d-flex gap-2 mt-3">
+              <button *ngIf="!isEnrolled(c.id)" class="btn btn-primary" (click)="enroll(c)">Enroll</button>
+              <button *ngIf="isEnrolled(c.id)" class="btn btn-outline-danger" (click)="unenroll(c)">Unenroll</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

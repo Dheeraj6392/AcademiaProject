@@ -1,0 +1,34 @@
+<div class="container">
+  <!-- old static banners removed – toast now handles feedback -->
+
+  <form (ngSubmit)="onSubmit()" [formGroup]="uploadForm" enctype="multipart/form-data">
+
+    <!-- File -->
+    <div class="mb-3">
+      <label class="form-label">UPLOAD FILE</label>
+      <input type="file" class="form-control" (change)="onFileChange($event)" required />
+    </div>
+
+    <!-- Semester -->
+    <div class="mb-3">
+      <label class="form-label">SEMESTER</label>
+      <input formControlName="semester" type="text" class="form-control" required />
+    </div>
+
+    <!-- Year -->
+    <div class="mb-3">
+      <label class="form-label">YEAR</label>
+      <input formControlName="year" type="text" class="form-control" required />
+    </div>
+
+    <!-- Course Name -->
+    <div class="mb-3">
+      <label class="form-label">COURSE NAME</label>
+      <input formControlName="courseName" type="text" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      Upload
+    </button>
+  </form>
+</div>

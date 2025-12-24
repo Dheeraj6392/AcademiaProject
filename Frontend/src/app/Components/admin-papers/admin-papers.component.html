@@ -1,0 +1,25 @@
+<div class="container py-4">
+  <h2>Pending Paper Uploads</h2>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="loading" class="alert alert-info">Loading...</div>
+
+  <div *ngIf="!loading && pending.length === 0" class="alert alert-secondary">No pending files.</div>
+
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-4" *ngFor="let file of pending">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ file.courseName || 'Unknown Course' }}</h5>
+          <p class="card-text mb-1">Semester: {{ file.semester || '-' }}</p>
+          <p class="card-text mb-1">Year: {{ file.year || '-' }}</p>
+          <a [href]="file.fileUrl" target="_blank" class="btn btn-link p-0">Preview</a>
+        </div>
+        <div class="card-footer d-flex gap-2 justify-content-end">
+          <button class="btn btn-success btn-sm" (click)="approve(file.id)">Approve</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="reject(file.id)">Reject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

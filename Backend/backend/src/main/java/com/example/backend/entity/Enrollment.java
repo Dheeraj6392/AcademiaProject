@@ -1,0 +1,40 @@
+package com.example.backend.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "enrollments", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "course_id"})
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Enrollment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER) // eager to avoid proxy serialization issues when returning Course
+    @JoinColumn(name = "course_id", nullable = false)
+    @JsonIgnore
+    private Course course;
+
+    private LocalDateTime enrolledAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (enrolledAt == null) {
+            enrolledAt = LocalDateTime.now();
+        }
+    }
+}

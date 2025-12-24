@@ -1,0 +1,29 @@
+<div class="container py-5" style="max-width: 500px;">
+  <h2 class="mb-4 text-center">Create Account</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input id="username" class="form-control" formControlName="username" placeholder="Choose a username" />
+      <div class="text-danger" *ngIf="form.controls['username'].touched && form.controls['username'].invalid">
+        Username is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control" formControlName="password" placeholder="Choose a password" />
+      <div class="text-danger" *ngIf="form.controls['password'].touched && form.controls['password'].invalid">
+        Password is required (min 4 characters).
+      </div>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <button class="btn btn-success w-100" [disabled]="loading">
+      {{ loading ? 'Creating account...' : 'Register' }}
+    </button>
+  </form>
+  <div class="text-center mt-3">
+    Already have an account? <a [routerLink]="['/login']">Sign In</a>
+  </div>
+</div>
