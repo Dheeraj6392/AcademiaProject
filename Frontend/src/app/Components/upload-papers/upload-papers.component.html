@@ -1,34 +1,54 @@
-<div class="container">
-  <!-- old static banners removed – toast now handles feedback -->
+<div class="container py-4" style="max-width: 640px;">
+  <h4 class="fw-bold mb-4">Upload Question Paper</h4>
 
-  <form (ngSubmit)="onSubmit()" [formGroup]="uploadForm" enctype="multipart/form-data">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <!-- File -->
     <div class="mb-3">
-      <label class="form-label">UPLOAD FILE</label>
-      <input type="file" class="form-control" (change)="onFileChange($event)" required />
+      <label class="form-label">PDF File <span class="text-danger">*</span></label>
+      <input type="file" class="form-control" accept=".pdf" (change)="onFileChange($event)" />
+      <div class="text-muted small mt-1" *ngIf="selectedFile">Selected: {{ selectedFile.name }}</div>
     </div>
 
-    <!-- Semester -->
     <div class="mb-3">
-      <label class="form-label">SEMESTER</label>
-      <input formControlName="semester" type="text" class="form-control" required />
+      <label class="form-label">Title <span class="text-danger">*</span></label>
+      <input class="form-control" formControlName="title" placeholder="e.g. Digital Electronics MidSem 2023" />
+      <div class="text-danger small mt-1" *ngIf="form.controls['title'].touched && form.controls['title'].invalid">
+        Title is required.
+      </div>
     </div>
 
-    <!-- Year -->
     <div class="mb-3">
-      <label class="form-label">YEAR</label>
-      <input formControlName="year" type="text" class="form-control" required />
+      <label class="form-label">Subject <span class="text-danger">*</span></label>
+      <input class="form-control" formControlName="subject" placeholder="e.g. Digital Electronics" />
     </div>
 
-    <!-- Course Name -->
-    <div class="mb-3">
-      <label class="form-label">COURSE NAME</label>
-      <input formControlName="courseName" type="text" class="form-control" required />
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Branch <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="branch">
+          <option value="">Select branch</option>
+          <option *ngFor="let b of branches" [value]="b">{{ b }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Year <span class="text-danger">*</span></label>
+        <input class="form-control" type="number" formControlName="year"
+               placeholder="2023" min="2000" max="2099" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Exam Type <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="examType">
+          <option value="">Select type</option>
+          <option *ngFor="let e of examTypes" [value]="e.value">{{ e.label }}</option>
+        </select>
+      </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">
-      Upload
+    <button class="btn btn-primary mt-4 w-100" type="submit" [disabled]="uploading">
+      {{ uploading ? 'Uploading...' : 'Upload Paper' }}
     </button>
+
   </form>
 </div>

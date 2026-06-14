@@ -1,17 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../Services/auth/auth.service';
-
-interface Course {
-  id: number;
-  title: string;
-  weeks: number;
-  lessons: number;
-  students: number;
-  rating: number; // 0-5
-  price: number;
-  imageUrl: string; // align with backend entity
-  description: string;
-}
+import { CourseService, CourseResponse } from '../../Services/course/course.service';
 
 @Component({
   selector: 'app-courses',
@@ -19,78 +7,33 @@ interface Course {
   styleUrl: './courses.component.css'
 })
 export class CoursesComponent implements OnInit {
-  courses: Course[] = [];
+  courses: CourseResponse[] = [];
+  loading = false;
+  error = '';
 
-  constructor(private auth: AuthService) {}
+  constructor(private courseService: CourseService) {}
 
-  ngOnInit(): void {
-    this.fetchCourses();
-    this.fetchEnrolledIds();
-  }
+  ngOnInit(): void { this.load(); }
 
-  fetchCourses() {
-    // Show all courses on this page
-    this.auth.getAllCourses().subscribe({
-      next: (data) => {
-        this.courses = data;
-      },
-      error: (err) => {
-        console.error('Failed to load courses', err);
-      }
+  load() {
+    this.loading = true;
+    this.courseService.getAllCourses().subscribe({
+      next: (data) => { this.courses = data; this.loading = false; },
+      error: () => { this.error = 'Failed to load courses'; this.loading = false; }
     });
   }
 
-  enrolledIds = new Set<number>();
-
-  private updateEnrolledIds() {
-    // Refresh enrolled course IDs from server
-    this.fetchEnrolledIds();
-  }
-
-  private fetchEnrolledIds() {
-    this.auth.getMyCourses().subscribe({
-      next: (my) => {
-        this.enrolledIds = new Set(my.map(c => c.id));
-      },
-      error: (err) => {
-        console.error('Failed to load enrolled courses', err);
-      }
+  enroll(course: CourseResponse) {
+    this.courseService.enroll(course.id).subscribe({
+      next: () => this.load(),
+      error: (err: any) => alert(err.status === 401 ? 'Please login to enroll' : 'Enrollment failed')
     });
   }
 
-  isEnrolled(courseId: number) {
-    return this.enrolledIds.has(courseId);
-  }
-
-  enroll(course: Course) {
-    this.auth.enroll(course.id).subscribe({
-      next: () => {
-        alert(`Enrolled in: ${course.title}`);
-        this.fetchCourses(); // refresh all courses list
-        this.fetchEnrolledIds(); // refresh enrolled state
-      },
-      error: (err) => {
-        if (err.status === 401) {
-          alert('Please login to enroll in courses');
-        } else {
-          alert('Enrollment failed.');
-        }
-        console.error('Enroll error', err);
-      }
-    });
-  }
-
-  unenroll(course: Course) {
-    this.auth.unenroll(course.id).subscribe({
-      next: () => {
-        alert(`Unenrolled from: ${course.title}`);
-        this.fetchCourses(); // refresh all courses list
-        this.fetchEnrolledIds(); // refresh enrolled state
-      },
-      error: (err) => {
-        alert('Unenroll failed.');
-        console.error('Unenroll error', err);
-      }
+  unenroll(course: CourseResponse) {
+    this.courseService.unenroll(course.id).subscribe({
+      next: () => this.load(),
+      error: () => alert('Unenroll failed')
     });
   }
 }

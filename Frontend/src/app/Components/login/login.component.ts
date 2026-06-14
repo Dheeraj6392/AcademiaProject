@@ -9,35 +9,32 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  form: FormGroup;
   loading = false;
   error = '';
-
-  // declare form property and initialize in constructor
-  form!: FormGroup;
+  isNewUser = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(4)]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/.*@iiita\.ac\.in$/)]],
+      name:  ['', [Validators.required, Validators.minLength(2)]]
     });
   }
 
   submit() {
     this.error = '';
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
-    const { username, password } = this.form.value;
-    this.auth.login(username!, password!).subscribe({
-      next: () => {
-        this.loading = false;
-        this.router.navigateByUrl('/');
-      },
+    const { email, name } = this.form.value;
+    const call$ = this.isNewUser
+      ? this.auth.register(email, name)
+      : this.auth.login(email, name);
+
+    call$.subscribe({
+      next: () => { this.loading = false; this.router.navigateByUrl('/'); },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.error || 'Login failed';
+        this.error = err?.error?.message || (this.isNewUser ? 'Registration failed' : 'Login failed');
       }
     });
   }

@@ -1,26 +1,63 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface QPaper {
-  id: number;
-  publicId: string;
+export interface Paper {
+  id: string;
+  title: string;
+  subject: string;
+  branch: string;
+  year: number;
+  examType: string;
   fileUrl: string;
-  semester: string | null;
-  year: string | null;
-  courseName: string | null;
-  uploadedAt: string;
+  downloadCount: number;
+  uploadedBy: string;
+  createdAt: string;
 }
-@Injectable({
-  providedIn: 'root'
-})
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class PaperDashboardService {
+  private base = 'http://localhost:8080/api/v1/papers';
 
-  private readonly API_URL = 'http://localhost:8080/api/files/papers';
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
+  getPapers(filters: {
+    q?: string;
+    branch?: string;
+    subject?: string;
+    year?: number;
+    examType?: string;
+    page?: number;
+    size?: number;
+  }): Observable<PageResponse<Paper>> {
+    let params = new HttpParams();
+    if (filters.q)        params = params.set('q', filters.q);
+    if (filters.branch)   params = params.set('branch', filters.branch);
+    if (filters.subject)  params = params.set('subject', filters.subject);
+    if (filters.year)     params = params.set('year', filters.year.toString());
+    if (filters.examType) params = params.set('examType', filters.examType);
+    params = params.set('page', (filters.page ?? 0).toString());
+    params = params.set('size', (filters.size ?? 10).toString());
+    return this.http.get<PageResponse<Paper>>(this.base, { params });
+  }
 
-  getQpapers(): Observable<QPaper[]> {
-    return this.http.get<QPaper[]>(this.API_URL);
+  getDownloadUrl(id: string): Observable<{ url: string }> {
+    return this.http.get<{ url: string }>(`${this.base}/${id}/download`);
+  }
+
+  deletePaper(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  uploadPaper(formData: FormData): Observable<Paper> {
+    return this.http.post<Paper>(this.base, formData);
   }
 }

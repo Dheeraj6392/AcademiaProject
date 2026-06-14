@@ -51,8 +51,10 @@
                             <div class="px-3 pb-2"><strong>{{ username }}</strong><div class="text-muted">Role: {{ auth.role }}</div></div>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" [routerLink]="['/cards']">My Dashboard</a>
-                            <a *ngIf="auth.isAdmin()" class="dropdown-item" [routerLink]="['/admin/papers']">Moderate Papers</a>
+                            <a class="dropdown-item" [routerLink]="['/papers_dashboard']">Browse Papers</a>
+                            <a class="dropdown-item" [routerLink]="['/subscriptions']">My Subscriptions</a>
                             <a *ngIf="auth.isAdmin()" class="dropdown-item" [routerLink]="['/upload_papers']">Upload Papers</a>
+                            <a *ngIf="auth.isAdmin()" class="dropdown-item" [routerLink]="['/admin/papers']">Admin Panel</a>
                             <a class="dropdown-item" [routerLink]="['/courses']">View Courses</a>
                             <a class="dropdown-item" [routerLink]="['/my-courses']">My Courses</a>
                             <div class="dropdown-divider"></div>
@@ -69,8 +71,7 @@
 <!-- ?*******************  hero section-->
 
 
-<section class="hero-wrap"
-    style="background-image: url('https://preview.colorlib.com/theme/academia/images/bg_1.jpg.webp');">
+<section class="hero-wrap">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text align-items-center">

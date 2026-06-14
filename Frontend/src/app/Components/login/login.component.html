@@ -1,29 +1,72 @@
-<div class="container py-5" style="max-width: 500px;">
-  <h2 class="mb-4 text-center">Sign In</h2>
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <div class="mb-3">
-      <label for="username" class="form-label">Username</label>
-      <input id="username" class="form-control" formControlName="username" placeholder="Enter your username" />
-      <div class="text-danger" *ngIf="form.controls['username'].touched && form.controls['username'].invalid">
-        Username is required.
+<div class="container py-5" style="max-width: 480px;">
+  <div class="card shadow-sm p-4">
+
+    <h2 class="mb-1 text-center fw-bold">PYQ Portal</h2>
+    <p class="text-center text-muted mb-4">
+      {{ isNewUser ? 'Create your account' : 'Welcome back!' }}
+    </p>
+
+    <!-- Toggle tabs -->
+    <div class="d-flex mb-4 rounded overflow-hidden border">
+      <button type="button" class="btn flex-grow-1 rounded-0"
+              [class.btn-primary]="!isNewUser"
+              [class.btn-light]="isNewUser"
+              (click)="isNewUser = false; error = ''">
+        Sign In
+      </button>
+      <button type="button" class="btn flex-grow-1 rounded-0"
+              [class.btn-primary]="isNewUser"
+              [class.btn-light]="!isNewUser"
+              (click)="isNewUser = true; error = ''">
+        New User
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="mb-3">
+        <label class="form-label">College Email <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="email"
+               placeholder="yourname&#64;iiita.ac.in" type="email" />
+        <div class="text-danger small mt-1"
+             *ngIf="form.controls['email'].touched && form.controls['email'].invalid">
+          Must be a valid &#64;iiita.ac.in email address.
+        </div>
       </div>
-    </div>
 
-    <div class="mb-3">
-      <label for="password" class="form-label">Password</label>
-      <input id="password" type="password" class="form-control" formControlName="password" placeholder="Enter your password" />
-      <div class="text-danger" *ngIf="form.controls['password'].touched && form.controls['password'].invalid">
-        Password is required (min 4 characters).
+      <div class="mb-3">
+        <label class="form-label">
+          Full Name <span class="text-danger">*</span>
+          <span class="text-muted small ms-1" *ngIf="!isNewUser">(used to create account if first time)</span>
+        </label>
+        <input class="form-control" formControlName="name"
+               placeholder="Your full name" />
+        <div class="text-danger small mt-1"
+             *ngIf="form.controls['name'].touched && form.controls['name'].invalid">
+          Name is required.
+        </div>
       </div>
+
+      <div class="alert alert-info py-2 small" *ngIf="isNewUser">
+        <strong>First time here?</strong> Just enter your IIITA email and name — your account is created automatically on first sign-in. No password needed.
+      </div>
+
+      <div class="alert alert-danger py-2" *ngIf="error">{{ error }}</div>
+
+      <button class="btn btn-primary w-100 mt-2" type="submit" [disabled]="loading">
+        {{ loading ? 'Please wait...' : (isNewUser ? 'Create Account & Sign In' : 'Sign In') }}
+      </button>
+
+    </form>
+
+    <div class="text-center mt-3 text-muted small">
+      <span *ngIf="!isNewUser">
+        First time? <a href="#" (click)="$event.preventDefault(); isNewUser = true; error = ''">Create an account</a>
+      </span>
+      <span *ngIf="isNewUser">
+        Already have an account? <a href="#" (click)="$event.preventDefault(); isNewUser = false; error = ''">Sign in</a>
+      </span>
     </div>
 
-    <div class="text-center mt-3">
-      Don't have an account? <a [routerLink]="['/register']">Register</a>
-    </div>
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-    <button class="btn btn-primary w-100" [disabled]="loading">
-      {{ loading ? 'Signing in...' : 'Sign In' }}
-    </button>
-  </form>
+  </div>
 </div>

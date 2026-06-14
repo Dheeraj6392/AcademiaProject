@@ -1,25 +1,163 @@
 <div class="container py-4">
-  <h2>Pending Paper Uploads</h2>
+  <h3 class="fw-bold mb-4">Admin Panel</h3>
 
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  <div *ngIf="loading" class="alert alert-info">Loading...</div>
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'papers'" (click)="switchTab('papers')">Papers</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'users'" (click)="switchTab('users')">Users</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'courses'" (click)="switchTab('courses')">Courses</button>
+    </li>
+  </ul>
 
-  <div *ngIf="!loading && pending.length === 0" class="alert alert-secondary">No pending files.</div>
+  <!-- ===== PAPERS TAB ===== -->
+  <div *ngIf="activeTab === 'papers'">
+    <div class="text-center py-4" *ngIf="papersLoading"><div class="spinner-border text-primary"></div></div>
+    <div class="alert alert-danger" *ngIf="papersError">{{ papersError }}</div>
+    <p class="text-muted small" *ngIf="!papersLoading">{{ totalElements }} paper(s) total</p>
 
-  <div class="row g-3">
-    <div class="col-md-6 col-lg-4" *ngFor="let file of pending">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ file.courseName || 'Unknown Course' }}</h5>
-          <p class="card-text mb-1">Semester: {{ file.semester || '-' }}</p>
-          <p class="card-text mb-1">Year: {{ file.year || '-' }}</p>
-          <a [href]="file.fileUrl" target="_blank" class="btn btn-link p-0">Preview</a>
-        </div>
-        <div class="card-footer d-flex gap-2 justify-content-end">
-          <button class="btn btn-success btn-sm" (click)="approve(file.id)">Approve</button>
-          <button class="btn btn-outline-danger btn-sm" (click)="reject(file.id)">Reject</button>
+    <div class="row g-3" *ngIf="!papersLoading && papers.length > 0">
+      <div class="col-md-6 col-lg-4" *ngFor="let paper of papers">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="badge bg-primary">{{ paper.branch }}</span>
+              <span class="badge bg-secondary">{{ formatExamType(paper.examType) }}</span>
+            </div>
+            <h6 class="card-title fw-bold">{{ paper.title }}</h6>
+            <p class="card-text text-muted small mb-1">{{ paper.subject }}</p>
+            <p class="card-text text-muted small">Year: {{ paper.year }}</p>
+            <p class="card-text text-muted small" *ngIf="paper.uploadedBy">By: {{ paper.uploadedBy }}</p>
+          </div>
+          <div class="card-footer text-end">
+            <button class="btn btn-outline-danger btn-sm" (click)="deletePaper(paper.id)">Delete</button>
+          </div>
         </div>
       </div>
+    </div>
+    <div class="text-center py-5 text-muted" *ngIf="!papersLoading && papers.length === 0">No papers found.</div>
+
+    <nav class="mt-4" *ngIf="totalPages > 1">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <button class="page-link" (click)="goToPage(currentPage - 1)">Previous</button>
+        </li>
+        <li class="page-item" *ngFor="let p of pages()" [class.active]="p === currentPage">
+          <button class="page-link" (click)="goToPage(p)">{{ p + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+          <button class="page-link" (click)="goToPage(currentPage + 1)">Next</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ===== USERS TAB ===== -->
+  <div *ngIf="activeTab === 'users'">
+    <div class="text-center py-4" *ngIf="usersLoading"><div class="spinner-border text-primary"></div></div>
+    <div class="alert alert-danger" *ngIf="usersError">{{ usersError }}</div>
+
+    <div class="table-responsive" *ngIf="!usersLoading && users.length > 0">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="{'bg-success': user.role==='ADMIN','bg-info': user.role==='UPLOADER','bg-secondary': user.role==='STUDENT'}">
+                {{ user.role }}
+              </span>
+            </td>
+            <td class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm" *ngIf="user.role !== 'UPLOADER'" (click)="updateRole(user.id,'UPLOADER')">Make Uploader</button>
+              <button class="btn btn-outline-secondary btn-sm" *ngIf="user.role !== 'STUDENT'" (click)="updateRole(user.id,'STUDENT')">Make Student</button>
+              <button class="btn btn-outline-danger btn-sm" *ngIf="user.role !== 'ADMIN'" (click)="updateRole(user.id,'ADMIN')">Make Admin</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center py-5 text-muted" *ngIf="!usersLoading && users.length === 0">No users found.</div>
+  </div>
+
+  <!-- ===== COURSES TAB ===== -->
+  <div *ngIf="activeTab === 'courses'">
+
+    <!-- Create course form -->
+    <div class="card p-4 mb-4 shadow-sm">
+      <h5 class="fw-bold mb-3">Create New Course</h5>
+      <form [formGroup]="courseForm" (ngSubmit)="createCourse()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Title <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="title" placeholder="e.g. Data Structures & Algorithms" />
+            <div class="text-danger small mt-1" *ngIf="courseForm.controls['title'].touched && courseForm.controls['title'].invalid">
+              Title is required.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Image URL <span class="text-muted small">(optional)</span></label>
+            <input class="form-control" formControlName="imageUrl" placeholder="https://..." />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="2" placeholder="Brief description of the course"></textarea>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Duration (weeks)</label>
+            <input class="form-control" type="number" formControlName="weeks" min="1" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Lessons</label>
+            <input class="form-control" type="number" formControlName="lessons" min="1" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Price (₹)</label>
+            <input class="form-control" type="number" formControlName="price" min="0" />
+          </div>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit" [disabled]="creatingCourse">
+          {{ creatingCourse ? 'Creating...' : 'Create Course' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Courses list -->
+    <div class="text-center py-4" *ngIf="coursesLoading"><div class="spinner-border text-primary"></div></div>
+    <div class="alert alert-danger" *ngIf="coursesError">{{ coursesError }}</div>
+
+    <div class="row g-3" *ngIf="!coursesLoading && courses.length > 0">
+      <div class="col-md-6 col-lg-4" *ngFor="let c of courses">
+        <div class="card h-100 shadow-sm">
+          <img [src]="c.imageUrl || 'https://picsum.photos/seed/' + c.id + '/400/200'"
+               class="card-img-top" style="height:140px; object-fit:cover;" [alt]="c.title" />
+          <div class="card-body">
+            <h6 class="card-title fw-bold">{{ c.title }}</h6>
+            <p class="card-text text-muted small">{{ c.description }}</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge bg-light text-dark border">{{ c.weeks }}w</span>
+              <span class="badge bg-light text-dark border">{{ c.lessons }} lessons</span>
+              <span class="badge bg-success" *ngIf="c.price === 0">Free</span>
+              <span class="badge bg-primary" *ngIf="c.price > 0">₹{{ c.price }}</span>
+              <span class="badge bg-info">{{ c.enrolledCount }} enrolled</span>
+            </div>
+          </div>
+          <div class="card-footer text-end">
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteCourse(c.id)">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center py-5 text-muted" *ngIf="!coursesLoading && courses.length === 0">
+      No courses yet. Create the first one above.
     </div>
   </div>
 </div>

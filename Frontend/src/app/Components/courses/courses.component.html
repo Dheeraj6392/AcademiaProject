@@ -3,35 +3,49 @@
 
 <section id="course" class="padding-medium">
   <div class="container">
+
+    <div class="text-center py-4" *ngIf="loading">
+      <div class="spinner-border text-primary"></div>
+    </div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
     <!-- Empty state -->
-    <div *ngIf="courses.length === 0" class="text-center py-5">
-      <img src="/images/empty-state.svg" alt="No courses" class="mb-4" style="max-width: 180px;" />
+    <div *ngIf="!loading && courses.length === 0" class="text-center py-5">
+      <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No courses" class="mb-4" style="max-width: 140px; opacity: 0.5;" />
       <h5 class="fw-semibold">No courses available right now.</h5>
       <p class="text-muted">Please check back later.</p>
     </div>
 
     <!-- Courses grid -->
-    <div class="text-center mb-3" *ngIf="courses.length > 0">
+    <div class="text-center mb-3" *ngIf="!loading && courses.length > 0">
       <p class="m-0 text-muted">Showing {{ courses.length }} courses</p>
     </div>
 
-    <div class="row" *ngIf="courses.length > 0">
+    <div class="row" *ngIf="!loading && courses.length > 0">
       <div class="col-md-6 col-lg-4 mb-4" *ngFor="let c of courses">
         <div class="course-card card h-100 position-relative">
           <div class="z-1 position-absolute m-3">
             <span class="badge bg-primary">{{ c.weeks }} Weeks</span>
           </div>
-          <img [src]="c.imageUrl" class="card-img-top object-fit-cover rounded-top" [alt]="c.title" style="height: 160px;" />
+          <img [src]="c.imageUrl || 'https://picsum.photos/seed/' + c.id + '/400/300'"
+               class="card-img-top object-fit-cover rounded-top" [alt]="c.title" style="height: 160px;" />
           <div class="card-body">
             <h5 class="card-title text-capitalize">{{ c.title }}</h5>
             <p class="card-text text-muted line-clamp-2">{{ c.description }}</p>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <small class="text-muted">{{ c.lessons }} lessons &bull; {{ c.enrolledCount }} enrolled</small>
+              <span class="fw-bold text-success" *ngIf="c.price === 0">Free</span>
+              <span class="fw-bold" *ngIf="c.price > 0">₹{{ c.price }}</span>
+            </div>
             <div class="d-flex gap-2 mt-3">
-              <button *ngIf="!isEnrolled(c.id)" class="btn btn-primary" (click)="enroll(c)">Enroll</button>
-              <button *ngIf="isEnrolled(c.id)" class="btn btn-outline-danger" (click)="unenroll(c)">Unenroll</button>
+              <button *ngIf="!c.enrolled" class="btn btn-primary btn-sm" (click)="enroll(c)">Enroll</button>
+              <button *ngIf="c.enrolled" class="btn btn-outline-danger btn-sm" (click)="unenroll(c)">Unenroll</button>
+              <span *ngIf="c.enrolled" class="badge bg-success align-self-center">Enrolled</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
