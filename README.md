@@ -1,207 +1,239 @@
-# 📚 Academia Full-Stack Project  
-A full-stack web application for uploading, storing, and managing academic documents such as PDFs, notes, assignments, and question papers.  
-This project is built using:
+# PYQ Portal — Academia Full-Stack Project
 
-- **Angular (Frontend)**
-- **Spring Boot (Backend)**
-- **MySQL Database**
-- **Cloudinary for File Upload**
-- **REST APIs**
-- **CORS + Spring Security Configuration**
+A full-stack **Previous Year Question Paper Portal** for IIITA students to browse, upload, and download question papers, enroll in courses, and manage subject subscriptions.
 
 ---
 
-## 🚀 Features
+## Tech Stack
 
-### 🔹 File Upload
-- Upload **PDF documents** from the Angular UI.
-- Automatically store file in **Cloudinary (raw upload)**.
-- Backend returns secure URL + metadata.
+### Backend
+- **Java 21** + **Spring Boot 3.2.5**
+- **PostgreSQL** via Supabase (connection pooler)
+- **Cloudinary** — PDF storage
+- **Apache Kafka** — async PDF indexing pipeline
+- **Elasticsearch** — full-text paper search
+- **Redis** — response caching
+- **Apache PDFBox** — PDF text extraction
+- **JWT** (JJWT 0.12.3) — stateless authentication
+- **Spring Security 6** — role-based access control
+- **Springdoc OpenAPI** — Swagger UI at `/swagger-ui.html`
+- **Lombok** + **Spring Data JPA**
 
-### 🔹 Metadata Storage
-Each upload stores:
-- Semester  
-- Year  
-- Course Name  
-- File URL  
-- Cloudinary Public ID  
-
-All metadata is saved in **MySQL database**.
-
-### 🔹 APIs Provided
-```
-POST /api/files/upload        → Upload a file with metadata  
-GET  /api/files               → List all uploaded files  
-GET  /api/files/{id}          → Fetch a single file  
-DELETE /api/files/{id}        → Delete file + Cloudinary asset
-```
+### Frontend
+- **Angular 18**
+- **Bootstrap 5**
+- **TypeScript**
+- JWT interceptor for authenticated requests
 
 ---
 
-## 🏛 Project Structure
+## Features
+
+### Authentication
+- IIITA college email (`@iiita.ac.in`) only
+- **Sign In** — validates email + name against DB
+- **New User** — registers on first use (no password)
+- Role-based access: `STUDENT` / `ADMIN`
+
+### Question Papers
+- Browse papers with filters: branch, exam type, year, free-text search
+- Download PDFs (Cloudinary-hosted)
+- Upload papers (Admin only) — PDF stored in Cloudinary, indexed via Kafka → Elasticsearch
+- Duplicate detection via MD5 hash
+- Admin can delete papers
+
+### Courses
+- Admin creates courses (title, description, weeks, lessons, price, image)
+- Students browse and enroll / unenroll
+- Enrolled count shown per course
+- My Courses page for enrolled students
+
+### Subscriptions
+- Students subscribe to subjects
+- Manage subscriptions from the Subscriptions page
+
+### Admin Panel (`/admin/papers`)
+- **Papers tab** — view all papers, delete, paginate
+- **Users tab** — change user roles (STUDENT ↔ ADMIN)
+- **Courses tab** — create and delete courses
+
+---
+
+## Project Structure
 
 ```
-Academia_FullStack/
+AcademiaProject/
+├── Backend/backend/
+│   └── src/main/java/com/pyqportal/
+│       ├── auth/          # JWT auth, login, register
+│       ├── paper/         # Paper entity, upload, search, download
+│       ├── course/        # Course entity, enrollment
+│       ├── subscription/  # Subject subscriptions
+│       ├── user/          # User entity, role management
+│       ├── search/        # Elasticsearch documents & service
+│       ├── indexworker/   # Kafka consumer — PDF indexing
+│       ├── storage/       # Cloudinary upload service
+│       ├── config/        # Security, Redis, Kafka, Elasticsearch
+│       ├── exception/     # Global exception handler
+│       └── common/        # Shared DTOs (PageResponse)
 │
-├── Backend/        # Spring Boot Application
-│   ├── controller/
-│   ├── service/
-│   ├── repository/
-│   ├── entity/
-│   ├── config/
-│   └── resources/application.properties
-│
-└── Frontend/       # Angular Application
-    ├── src/app/
-    │     ├── upload-papers/
-    │     └── services/
-    └── angular.json
+└── Frontend/src/app/
+    ├── Components/
+    │   ├── login/           # Sign In / New User toggle
+    │   ├── paper-dashboard/ # Browse & download papers
+    │   ├── upload-papers/   # Upload PDF (admin only)
+    │   ├── admin-papers/    # Admin panel (papers/users/courses)
+    │   ├── courses/         # Course catalog + enroll
+    │   ├── my-courses/      # Enrolled courses
+    │   ├── subscriptions/   # Subject subscriptions
+    │   └── cards/           # Dashboard home
+    └── Services/
+        ├── auth/            # AuthService, guards, JWT interceptor
+        ├── paper_dashboard/ # Paper API service
+        ├── course/          # Course API service
+        └── subscription/    # Subscription API service
 ```
 
 ---
 
-## 🛠️ Technologies Used
+## Local Setup
 
-### Frontend  
-- Angular 17  
-- TypeScript  
-- Reactive Forms  
-- HTML/CSS  
-- Bootstrap  
+### Prerequisites
+- Java 21
+- Node.js 18+
+- Docker (for Kafka, Redis, Elasticsearch)
+- Supabase account (PostgreSQL)
+- Cloudinary account
 
-### Backend  
-- Spring Boot 3  
-- Spring MVC  
-- Spring Data JPA  
-- MySQL  
-- Cloudinary Java SDK  
-- Lombok  
+### 1. Clone
 
----
-
-## ⚙️ Backend Setup Guide
-
-### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/Dheeraj6392/Academia_FullStack.git
-cd Academia_FullStack/Backend
+git clone https://github.com/Dheeraj6392/AcademiaProject.git
+cd AcademiaProject
 ```
 
-### 2️⃣ MySQL Database Setup
-Run these commands:
+### 2. Start Docker services
 
-```sql
-CREATE DATABASE uploads_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-CREATE USER 'upload_user'@'localhost' IDENTIFIED BY 'System123@';
-GRANT ALL PRIVILEGES ON uploads_db.* TO 'upload_user'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-### 3️⃣ Configure `application.properties`
-```
-spring.datasource.url=jdbc:mysql://localhost:3306/uploads_db?allowPublicKeyRetrieval=true&useSSL=false
-spring.datasource.username=upload_user
-spring.datasource.password=System123@
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-cloudinary.cloud-name=dmzb1cnwn
-cloudinary.api-key=YOUR_API_KEY
-cloudinary.api-secret=YOUR_API_SECRET
-cloudinary.upload-preset=unsigned_pdf
-```
-
-### 4️⃣ Run Backend
 ```bash
-mvn spring-boot:run
+cd Backend/backend
+docker compose up -d
 ```
 
----
+This starts Kafka, Zookeeper, Redis, and Elasticsearch.
 
-## 🌐 Frontend Setup Guide
+### 3. Configure secrets
 
-### 1️⃣ Install Dependencies
+Create `Backend/backend/src/main/resources/application-local.yml`:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://<supabase-pooler-host>:6543/postgres?sslmode=require
+    username: postgres.<project-ref>
+    password: <your-password>
+
+cloudinary:
+  cloud-name: <your-cloud-name>
+  api-key: <your-api-key>
+  api-secret: <your-api-secret>
+
+jwt:
+  secret: <min-32-char-secret-key>
+  expiration: 86400000
+```
+
+> `application-local.yml` is gitignored — never commit secrets.
+
+### 4. Run Backend
+
+```bash
+cd Backend/backend
+chmod +x mvnw
+./mvnw spring-boot:run
+```
+
+Backend starts at `http://localhost:8080`.
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### 5. Run Frontend
+
 ```bash
 cd Frontend
 npm install
+ng serve
 ```
 
-### 2️⃣ Start Angular App
-```bash
-ng serve --open
-```
-
-### 3️⃣ Update API URL in Angular service
-```ts
-private apiUrl = "http://localhost:8080/api/files/upload";
-```
+Frontend starts at `http://localhost:4200`.
 
 ---
 
-## 📤 Postman File Upload Example
+## API Endpoints
 
-### Method  
-```
-POST /api/files/upload
-```
+### Auth
+| Method | Endpoint | Access |
+|--------|----------|--------|
+| POST | `/api/v1/auth/register` | Public |
+| POST | `/api/v1/auth/login` | Public |
+| GET  | `/api/v1/auth/me` | Authenticated |
 
-### Body → `form-data`
+### Papers
+| Method | Endpoint | Access |
+|--------|----------|--------|
+| GET    | `/api/v1/papers` | Authenticated |
+| POST   | `/api/v1/papers` | Admin |
+| GET    | `/api/v1/papers/{id}/download` | Authenticated |
+| DELETE | `/api/v1/papers/{id}` | Admin |
 
-| Key        | Type | Value |
-|------------|------|-------|
-| file       | File | choose PDF |
-| semester   | Text | 5 |
-| year       | Text | 2024 |
-| courseName | Text | Operating Systems |
+### Courses
+| Method | Endpoint | Access |
+|--------|----------|--------|
+| GET    | `/api/v1/courses` | Authenticated |
+| POST   | `/api/v1/courses` | Admin |
+| GET    | `/api/v1/courses/my` | Authenticated |
+| POST   | `/api/v1/courses/{id}/enroll` | Authenticated |
+| DELETE | `/api/v1/courses/{id}/enroll` | Authenticated |
+| DELETE | `/api/v1/courses/{id}` | Admin |
 
-### Example Response
-```json
-{
-  "id": 1,
-  "fileUrl": "https://res.cloudinary.com/.../abc.pdf",
-  "publicId": "abc12xyz",
-  "semester": "5",
-  "year": "2024",
-  "courseName": "Operating Systems"
-}
-```
+### Subscriptions
+| Method | Endpoint | Access |
+|--------|----------|--------|
+| GET    | `/api/v1/subscriptions` | Authenticated |
+| POST   | `/api/v1/subscriptions` | Authenticated |
+| DELETE | `/api/v1/subscriptions/{id}` | Authenticated |
 
----
-
-## 🧪 Testing Steps
-
-✔ Start MySQL  
-✔ Start Spring Boot backend  
-✔ Start Angular frontend  
-✔ Open browser → http://localhost:4200  
-✔ Upload a PDF  
-✔ Check Cloudinary Dashboard  
-✔ Check MySQL Workbench  
-
----
-
-## 📦 Database Table: `uploaded_files`
-
-| Column | Type |
-|--------|------|
-| id | BIGINT (PK) |
-| semester | VARCHAR |
-| year | VARCHAR |
-| course_name | VARCHAR |
-| file_url | TEXT |
-| public_id | VARCHAR |
-| uploaded_at | TIMESTAMP |
+### Users (Admin)
+| Method | Endpoint | Access |
+|--------|----------|--------|
+| GET    | `/api/v1/users` | Admin |
+| PATCH  | `/api/v1/users/{id}/role` | Admin |
 
 ---
 
-## 🤝 Contribution
-Pull requests are welcome!  
-Feel free to report bugs or request features.
+## Database Tables (auto-created by Hibernate)
+
+| Table | Description |
+|-------|-------------|
+| `users` | Email, name, role |
+| `papers` | Title, subject, branch, year, exam type, file URL, MD5 hash |
+| `courses` | Title, description, weeks, lessons, price, image URL |
+| `enrollments` | User ↔ Course join (unique constraint) |
+| `subscriptions` | User ↔ Subject |
 
 ---
 
-## ⭐ Support
-If you like this project, please give it a ⭐ on GitHub!
+## Making Yourself Admin
 
+1. Register via the app
+2. Go to **Supabase → Table Editor → users**
+3. Change your `role` column to `ADMIN`
+4. Log out and sign in again (refreshes JWT)
+
+---
+
+## Contribution
+
+Pull requests are welcome. Feel free to open issues for bugs or feature requests.
+
+## Support
+
+If you find this project useful, give it a ⭐ on GitHub!
